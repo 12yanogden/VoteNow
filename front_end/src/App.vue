@@ -1,23 +1,61 @@
 <template>
   <div id="app">
-    <header id="header">
-      <nav>
-        <router-link to="/" class="logo">
-          <i class="fa fa-paper-plane fa-4x"></i>
-          <h1>BallotBuilder</h1>
+    <nav class="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <router-link to="/" alt="VoteNow" class="navbar-item">
+          <img src="./assets/logo_navbar.png" id="logo"/>
         </router-link>
-        <div>
-          <router-link to="/dashboard"><i class="fas fa-user"></i></router-link>
-          <i v-if="builder" class="fas fa-sign-out-alt pointer" @click.prevent="logout"></i>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+          <span v-if="!user" aria-hidden="true">Create an account</span>
+          <span v-if="!user" aria-hidden="true">Sign in</span>
+          <span v-if="user" aria-hidden="true" @click.prevent="logout">Logout</span>
+        </a>
+      </div>
+      <div class="navbar-menu">
+        <div class="navbar-end">
+          <div class="navbar-buttons">
+            <button class="navbar-button">Create an account</button>
+            <button class="navbar-button">Sign in</button>
+            <div v-if="user" class="navbar-item has-dropdown">
+              <a class="navbar-link">
+                <i class="fas fa-user"></i>
+              </a>
+
+              <div class="navbar-dropdown">
+                <router-link to="/account" class="navbar-item">
+                  My Account
+                </router-link>
+                <router-link to="/elections" class="navbar-item">
+                  Elections
+                </router-link>
+                <router-link to="/candidates" class="navbar-item">
+                  Candidates
+                </router-link>
+                <hr class="navbar-divider">
+                <div class="navbar-item" @click.prevent="logout">
+                  Logout
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </nav>
-    </header>
+      </div>
+    </nav>
     <div class="wrapper">
       <router-view class="view"/>
-      <div class="push"></div>
     </div>
     <footer class="footer">
-      <a id="githubLink" href="https://github.com/12yanogden/project.cs260.xyz">GitHub</a>
+      <div class="content center m-5">
+        <div class="is-flex is-flex-direction-column">
+          <div>
+            <strong>VoteNow</strong> by Ryan Ogden
+          </div>
+          <a id="githubLink" href="https://github.com/12yanogden/VoteNow">
+            <i class="fa fa-github fa-2x" aria-hidden="true"></i>
+          </a>
+        </div>  
+      </div>
     </footer>
   </div>
 </template>
@@ -28,24 +66,24 @@ export default {
   name: 'app',
   async created() {
     try {
-      let response = await axios.get('/api/builders');
-      this.$root.$data.builder = response.data.builder;
+      let response = await axios.get('/api/users');
+      this.$root.$data.user = response.data.user;
     } catch (error) {
-      this.$root.$data.builder = null;
+      this.$root.$data.user = null;
     }
   },
   computed: {
-    builder() {
-      return this.$root.$data.builder;
+    user() {
+      return this.$root.$data.user;
     }
   },
   methods: {
     async logout() {
       try {
-        await axios.delete("/api/builders");
-        this.$root.$data.builder = null;
+        await axios.delete("/api/users");
+        this.$root.$data.user = null;
       } catch (error) {
-        this.$root.$data.builder = null;
+        this.$root.$data.user = null;
       }
     },
   }
@@ -55,10 +93,16 @@ export default {
 <style>
 /* Color palette: https://www.schemecolor.com/wp-content/themes/colorsite/include/cc4.php?color0=b42033&color1=cecece&color2=fefefe&color3=3c3b6e&pn=American%20Red,%20White%20and%20Blue */
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Work Sans', sans-serif;
   font-weight: 300;
   font-size: 16pt;
+  padding: 0;
+  margin: 0;
 }
 
 .center {
@@ -98,70 +142,21 @@ body {
   cursor: pointer;
 }
 
-.button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: fit-content;
-  font-size: 20pt;
-  font-weight: 600;
-  color: white;
-  background: #B42033;
-  cursor: pointer;
-  padding: 0.5em 1em;
-  border: none;
-}
-
 a:link {
   text-decoration: none;
 }
 
-#header {
-  position: relative;
-  width: 100%;
-  left: 50%;
-  transform: translate(-50%, 0);
-  /* Color and alignment */
-  background: #3C3B6E;
-  text-align: center;
-  box-shadow: 0 0 0 1em white;
+.navbar {
+  height: 100px;
 }
 
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.navbar-item img {
+  max-height: initial;
+  max-width: 300px;
 }
 
-.logo {
-  display: flex;
-  flex-direction: row;
-}
-
-.logo i {
-  font-size: 24pt !important;
-  padding-right: 0 !important;
-  margin: 0;
-}
-
-#header h1 {
-  color: white;
-  font-size: 24pt !important;
-  padding: 1em;
-  margin: 0;
-}
-
-#header i {
-  color: white;
-  font-size: 24px;
-  padding: 1em;
-  margin: 0;
-}
-
-#header .fas {
-  font-size: 25px;
-  color: white;
-  width: 50px;
+#wrapperLeft {
+  margin: 0 1em 0 0;
 }
 
 .pure-button-primary {
@@ -183,30 +178,5 @@ html, body, .app {
 
 .push {
   height: 50px;
-}
-
-.footer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 50px;
-  background: #3C3B6E;
-  margin-top: 2em;
-}
-
-#githubLink {
-  text-decoration: none;
-  color: white;
-}
-
-.error {
-  display: inline;
-  border-radius: 10px;
-  font-size: 10px;
-  background-color: #B42033;
-  color: white;
-  padding: 5px 20px;
-  margin: 10px 0 0 0;
 }
 </style>

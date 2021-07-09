@@ -1,6 +1,6 @@
 <template>
 <div class="dashboard">
-  <MyDashboard v-if="builder" />
+  <MyDashboard v-if="user" />
   <Login v-else />
 </div>
 </template>
@@ -17,15 +17,15 @@ export default {
   },
   async created() {
     try {
-      let response = await axios.get('/api/builders');
-      this.$root.$data.builder = response.data.builder;
+      let response = await axios.get('/api/users');
+      this.$root.$data.user = response.data.user;
     } catch (error) {
-      this.$root.$data.builder = null;
+      this.$root.$data.user = null;
     }
   },
   computed: {
-    builder() {
-      return this.$root.$data.builder;
+    user() {
+      return this.$root.$data.user;
     }
   }
 }

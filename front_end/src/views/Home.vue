@@ -1,30 +1,30 @@
 <template>
 <div class="home col">
+  <video autoplay muted loop id="homeVideo">
+      <source id="homeVideoSource" src="../assets/homeVideo_short.mp4" type="video/mp4">
+  </video>
   <div id="voteRow" class="section">
-    <video autoplay muted loop id="homeVideo">
-      <source src="../assets/homeVideo_short.mp4" type="video/mp4">
-    </video>
     <h1 class="bannerLabel" id="bannerLabel1">Make your voice</h1>
     <h1 class="bannerLabel" id="bannerLabel2">HEARD</h1>
-    <router-link to="/dashboard"><div class="button">Build your ballot</div></router-link>
+    <router-link to="/dashboard"><div class="button">Vote</div></router-link>
   </div>
   <div id="whyRow" class="section">
-    <h1 id="whyStatement">Why use BallotBuilder?</h1>
+    <h1 id="whyStatement">Why use VoteNow?</h1>
     <div class="row">
       <div class="whyReason col">
         <i class="fa fa-lock fa-4x whyReasonIcon" aria-hidden="true"></i>
         <h2>Secure</h2>
-        <p>Our data is managed in the US by the best names in cybersecurity.</p>
+        <p>We take the security of your data seriously. We use encryption and do not sell your data.</p>
       </div>
       <div class="whyReason col">
         <i class="fa fa-thumbs-up fa-4x whyReasonIcon" aria-hidden="true"></i>
         <h2>Easy</h2>
-        <p>No hastle! You can build your ballot instantly and from anywhere.</p>
+        <p>Vote instantly and from anywhere! You can verify your identity along the way.</p>
       </div>
       <div class="whyReason col">
         <i class="fa fa-university fa-4x whyReasonIcon" aria-hidden="true"></i>
         <h2>Reliable</h2>
-        <p>No lost ballots. Your ballot is accessible at all times.</p>
+        <p>No lost ballots. Your can see exactly if and when your ballot is counted.</p>
       </div>
     </div>
   </div>
@@ -86,12 +86,21 @@ export default {
   position: fixed;
   z-index: -1;
   min-width: 100%;
+  min-height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+#homeVideoSource {
+  min-width: 100%;
+  min-height: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 @media (min-aspect-ratio: 16/9) {
     #homeVideo {
       width: 100%;
-      height: auto;
     }
 }
 

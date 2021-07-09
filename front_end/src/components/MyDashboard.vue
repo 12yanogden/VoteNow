@@ -84,8 +84,8 @@ export default {
     }
   },
   computed: {
-    builder() {
-      return this.$root.$data.builder;
+    user() {
+      return this.$root.$data.user;
     },
     hasNextBallots() {
       let hasNextBallots = true;
@@ -99,7 +99,7 @@ export default {
   },
   methods: {
     isOwner(ballot) {
-      return (ballot.ballot.builder._id == this.$root.$data.builder._id);
+      return (ballot.ballot.user._id == this.$root.$data.user._id);
     },
     formatDate(date) {
       return moment(date).add(1, 'day').format('MM/DD/YYYY');

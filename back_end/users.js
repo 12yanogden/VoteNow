@@ -3,14 +3,18 @@ const mongoose = require('mongoose');
 const argon2 = require("argon2");
 const router = express.Router();
 
-const builderSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
   username: String,
   password: String,
+  role: {
+    type: String,
+    default: "user"
+  },
 });
 
-builderSchema.pre('save', async function(next) {
+userSchema.pre('save', async function(next) {
   if (!this.isModified('password'))
     return next();
 
@@ -25,7 +29,7 @@ builderSchema.pre('save', async function(next) {
   }
 });
 
-builderSchema.methods.comparePassword = async function(password) {
+userSchema.methods.comparePassword = async function(password) {
   try {
     const isMatch = await argon2.verify(this.password, password);
     
@@ -35,35 +39,35 @@ builderSchema.methods.comparePassword = async function(password) {
   }
 };
 
-builderSchema.methods.toJSON = function() {
+userSchema.methods.toJSON = function() {
   var obj = this.toObject();
   delete obj.password;
   
   return obj;
 }
 
-const Builder = mongoose.model('Builder', builderSchema);
+const User = mongoose.model('User', userSchema);
 
 // Middleware
-const validBuilder = async (req, res, next) => {
-  if (!req.session.builderID)
+const validUser = async (req, res, next) => {
+  if (!req.session.userID)
     return res.status(403).send({
-      message: "No builder is logged in"
+      message: "No user is logged in"
     });
   try {
-    const builder = await Builder.findOne({
-      _id: req.session.builderID
+    const user = await User.findOne({
+      _id: req.session.userID
     });
-    if (!builder) {
+    if (!user) {
       return res.status(403).send({
-        message: "No builder is logged in"
+        message: "No user is logged in"
       });
     }
  
-    req.builder = builder;
+    req.user = user;
   } catch (error) {
     return res.status(403).send({
-      message: "No builder is logged in"
+      message: "No user is logged in"
     });
   }
 
@@ -97,28 +101,28 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const existingBuilder = await Builder.findOne({
+    const existingUser = await User.findOne({
       username: req.body.username
     });
 
-    if (existingBuilder) {
+    if (existingUser) {
       return res.status(403).send({
         message: "username \"" + req.body.username + "\" already exists"
       });
     }
 
-    const builder = new Builder({
+    const user = new User({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       username: req.body.username,
       password: req.body.password
     });
 
-    await builder.save();
-    req.session.builderID = builder._id;
+    await user.save();
+    req.session.userID = user._id;
 
     return res.send({
-      builder: builder
+      user: user
     });
   } catch (error) {
     console.log(error);
@@ -141,24 +145,24 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    const builder = await Builder.findOne({
+    const user = await User.findOne({
       username: req.body.username
     });
 
-    if (!builder)
+    if (!user)
       return res.status(403).send({
         message: "username or password is wrong"
       });
 
-    if (!await builder.comparePassword(req.body.password))
+    if (!await user.comparePassword(req.body.password))
       return res.status(403).send({
         message: "username or password is wrong"
       });
 
-    req.session.builderID = builder._id;
+    req.session.userID = user._id;
 
     return res.send({
-      builder: builder
+      user: user
     });
 
   } catch (error) {
@@ -167,10 +171,10 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.get('/', validBuilder, async (req, res) => {
+router.get('/', validUser, async (req, res) => {
   try {
     res.send({
-      builder: req.builder
+      user: req.user
     });
   } catch (error) {
     console.log(error);
@@ -178,8 +182,8 @@ router.get('/', validBuilder, async (req, res) => {
   }
 });
 
-// Logs the builder out
-router.delete("/", validBuilder, async (req, res) => {
+// Logs the user out
+router.delete("/", validUser, async (req, res) => {
   try {
     req.session = null;
     res.sendStatus(200);
@@ -191,6 +195,6 @@ router.delete("/", validBuilder, async (req, res) => {
 
 module.exports = {
   routes: router,
-  model: Builder,
-  valid: validBuilder
+  model: User,
+  valid: validUser
 };

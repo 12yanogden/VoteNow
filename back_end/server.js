@@ -45,7 +45,7 @@ app.use("/api/candidates", candidates.routes);
 const measures = require("./measures.js");
 app.use("/api/measures", measures.routes);
 
-const builders = require("./builders.js");
-app.use("/api/builders", builders.routes);
+const users = require("./users.js");
+app.use("/api/users", users.routes);
 
 app.listen(3000, () => console.log('Server listening on port 3000!'));

@@ -6,9 +6,9 @@ const ballotSchema = new mongoose.Schema({
   name: String,
   openDate: Date,
   closeDate: Date,
-  builder: {
+  user: {
     type: mongoose.Schema.ObjectId,
-    ref: 'Builder'
+    ref: 'User'
   },
 });
 
@@ -35,9 +35,9 @@ router.post('/', async (req, res) => {
     });
   }
 
-  if (!req.body.builder) {
+  if (!req.body.user) {
     return res.status(400).send({
-      message: "ballots.js: invalid builder \"" + req.body.builder + "\""
+      message: "ballots.js: invalid user \"" + req.body.user + "\""
     });
   }
 
@@ -45,7 +45,7 @@ router.post('/', async (req, res) => {
     name: req.body.name,
     openDate: req.body.openDate,
     closeDate: req.body.closeDate,
-    builder: req.body.builder,
+    user: req.body.user,
   });
 
   try {
@@ -61,7 +61,7 @@ router.get('/all', async (req, res) => {
   try {
     let ballots = await Ballot.find().sort({
       closeDate: -1
-    }).populate('builder');
+    }).populate('user');
 
     return res.send(ballots);
   } catch (error) {
@@ -74,7 +74,7 @@ router.get('/:id', async (req, res) => {
   try {
     let ballot = await Ballot.findOne({
       _id: req.params.id
-    }).populate('builder');
+    }).populate('user');
 
     return res.send(ballot);
   } catch (error) {
@@ -87,7 +87,7 @@ router.put('/:id', async (req, res) => {
   try {
     let ballot = await Ballot.findOne({
       _id: req.params.id
-    }).populate('builder');
+    }).populate('user');
 
     ballot.name = req.body.name;
     ballot.openDate = req.body.openDate;
